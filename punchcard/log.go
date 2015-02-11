@@ -4,10 +4,10 @@ package punchcard
  *
  * A punchcard-log stream consists of lines with the following format:
  * IN	2006-01-02T15:04:05Z07:00	project name
- * OUT	2006-01-02T15:04:05Z07:00
+ * OUT	2006-01-02T15:04:05Z07:00	project name
  *
- * Any IN line *MUST* be followed by an OUT line. OUT lines only have 2 elements,
- * whereas IN lines have 3.
+ * An IN line *MUST* be followed by an OUT line. The project name field of an
+ * OUT line *MUST* match the project name on the IN line before it.
  */
 
 import (
