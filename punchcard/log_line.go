@@ -44,18 +44,23 @@ func parseLogLine(line string) (LogLine, error) {
 	// parse the line into usable bits
 	pieces := strings.Split(line, "\t")
 	if len(pieces) < 2 {
-		return LogLine{}, errors.New("Not enough line elements")
+		return LogLine{},
+			fmt.Errorf("Not enough line elements in line \"%s\"",
+				line)
 	}
 	action, err := actionFromName(pieces[0])
 	if err != nil {
 		return LogLine{}, err
 	}
 	if (action == IN && 3 != len(pieces)) || (action == OUT && 2 != len(pieces)) {
-		return LogLine{}, errors.New("Wrong number of line elements")
+		return LogLine{},
+			fmt.Errorf("Wrong number of line elements in \"%s\"",
+				line)
 	}
 	time, err := time.Parse(time.RFC3339, pieces[1])
 	if err != nil {
-		return LogLine{}, err
+		return LogLine{},
+			fmt.Errorf("Error parsing time in line \"%s\"", line)
 	}
 
 	var logline LogLine
