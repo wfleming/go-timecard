@@ -7,10 +7,37 @@ import (
 	"time"
 )
 
+type Action int
+
+const (
+	IN  Action = iota
+	OUT        = iota
+)
+
 type LogLine struct {
 	action  Action
 	time    time.Time
 	project string
+}
+
+func actionGetName(action Action) (string, error) {
+	if IN == action {
+		return "IN", nil
+	} else if OUT == action {
+		return "OUT", nil
+	} else {
+		return "", errors.New("not a valid Action value")
+	}
+}
+
+func actionFromName(name string) (Action, error) {
+	if "IN" == name {
+		return IN, nil
+	} else if "OUT" == name {
+		return OUT, nil
+	} else {
+		return -1, errors.New("not a valid action name")
+	}
 }
 
 func parseLogLine(line string) (LogLine, error) {
