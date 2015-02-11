@@ -11,6 +11,10 @@ type Entry struct {
 	project string
 }
 
+func NewEntry() *Entry {
+	return &Entry{}
+}
+
 func (entry *Entry) IsZero() bool {
 	return (entry.timeIn.IsZero() && entry.timeOut.IsZero() &&
 		"" == entry.project)
