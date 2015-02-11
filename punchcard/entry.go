@@ -29,10 +29,12 @@ func (entry *Entry) pushLogLine(line LogLine) error {
 		return errors.New("Entry must punch in before punching out")
 	case !entry.timeIn.IsZero() && OUT != line.action:
 		return errors.New("Entry must cannot punch in twice")
-	case IN == line.action && "" == line.project:
+	case "" == line.project:
 		return errors.New("Empty project name not permitted")
 	case OUT == line.action && line.time.Before(entry.timeIn):
 		return errors.New("Punch out time cannot be before in time")
+	case OUT == line.action && line.project != entry.project:
+		return errors.New("Punch out project does not match in project")
 	}
 
 	switch line.action {

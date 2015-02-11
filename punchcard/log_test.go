@@ -30,7 +30,7 @@ var time1, _ = time.Parse(time.RFC3339, "2015-02-10T15:30:10Z")
 var time2, _ = time.Parse(time.RFC3339, "2015-02-10T16:30:10Z")
 var time3, _ = time.Parse(time.RFC3339, "2015-02-10T16:45:10Z")
 var lines = "IN\t2015-02-10T15:30:10Z\tcoding\n" +
-	"OUT\t2015-02-10T16:30:10Z\n" +
+	"OUT\t2015-02-10T16:30:10Z\tcoding\n" +
 	"IN\t2015-02-10T16:45:10Z\ttyping\n"
 
 func TestAllLogLines(t *testing.T) {
@@ -53,7 +53,7 @@ func TestAllLogLines(t *testing.T) {
 	}
 
 	logline = loglines[1]
-	if !logline.time.Equal(time2) || logline.project != "" ||
+	if !logline.time.Equal(time2) || logline.project != "coding" ||
 		logline.action != OUT {
 		t.Error("second LogLine not as expected", logline)
 	}
@@ -147,7 +147,7 @@ func TestPunchInAndOut(t *testing.T) {
 		t.Fatal("punch in should not have failed")
 	}
 
-	expected = expected + "OUT\t2015-02-10T16:30:10Z\n"
+	expected = expected + "OUT\t2015-02-10T16:30:10Z\tcoding\n"
 	if expected != data.String() {
 		t.Errorf("after punch out, log buffer contents do not match: expected {%s} but got {%s}",
 			expected, data.String())

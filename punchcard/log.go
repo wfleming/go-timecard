@@ -111,7 +111,7 @@ func (log Log) PunchOut(time time.Time) error {
 	} else if lastEntry == nil || lastEntry.IsZero() {
 		return errors.New("Entry should not be empty")
 	}
-	logline := LogLine{OUT, time, ""}
+	logline := LogLine{OUT, time, lastEntry.project}
 	line := logline.String() + "\n"
 	bytes, err := (*log.out).Write([]byte(line))
 	if err != nil {

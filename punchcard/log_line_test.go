@@ -58,11 +58,11 @@ func TestParseLogLineGoodInLine(t *testing.T) {
 
 func TestParseLogLineGoodOutLine(t *testing.T) {
 	parsedTime, _ := time.Parse(time.RFC3339, "2015-02-10T15:30:10Z")
-	line := "OUT\t2015-02-10T15:30:10Z"
+	line := "OUT\t2015-02-10T15:30:10Z\tproject name"
 	logline, err := parseLogLine(line)
 	if err != nil {
 		t.Error("Unexpected parsing error", err)
-	} else if logline.project != "" {
+	} else if logline.project != "project name" {
 		t.Error("LogLine has wrong project name")
 	} else if !logline.time.Equal(parsedTime) {
 		t.Error("LogLine has wrong time")
@@ -72,7 +72,7 @@ func TestParseLogLineGoodOutLine(t *testing.T) {
 }
 
 func TestParseLogLineBadOutLine(t *testing.T) {
-	line := "OUT\t2015-02-10T15:30:10Z\tfoo bar"
+	line := "OUT\t2015-02-10T15:30:10Z"
 	if _, err := parseLogLine(line); err == nil {
 		t.Error("Parsing should have failed")
 	}
@@ -110,9 +110,9 @@ func TestLogLineStringInLine(t *testing.T) {
 
 func TestLogLineStringOutLine(t *testing.T) {
 	parsedTime, _ := time.Parse(time.RFC3339, "2015-02-10T15:30:10Z")
-	logline := LogLine{OUT, parsedTime, ""}
+	logline := LogLine{OUT, parsedTime, "project name"}
 	strline := logline.String()
-	if "OUT\t2015-02-10T15:30:10Z" != strline {
+	if "OUT\t2015-02-10T15:30:10Z\tproject name" != strline {
 		t.Error("Not expected line string", strline)
 	}
 }

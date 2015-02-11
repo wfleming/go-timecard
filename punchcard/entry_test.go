@@ -43,6 +43,10 @@ func TestEntryPushLogLineErrors(t *testing.T) {
 		t.Error("can't punch out before punching in")
 	}
 
+	if entry.pushLogLine(LogLine{OUT, now.Add(600), "bar"}) == nil {
+		t.Error("can't punch out with different project name")
+	}
+
 	entry.timeOut = now
 
 	if entry.pushLogLine(LogLine{OUT, now.Add(600), ""}) == nil {
@@ -67,7 +71,7 @@ func TestEntryPushLogLineSuccess(t *testing.T) {
 	}
 
 	future := now.Add(500)
-	if entry.pushLogLine(LogLine{OUT, future, ""}) != nil {
+	if entry.pushLogLine(LogLine{OUT, future, project}) != nil {
 		t.Error("punch out should not have failed")
 	}
 
