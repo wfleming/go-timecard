@@ -11,5 +11,6 @@ type Entry struct {
 }
 
 func (entry Entry) IsZero() bool {
-	return entry.timeIn.IsZero() && entry.timeOut.IsZero() && "" == entry.project
+	return (entry.timeIn.IsZero() && entry.timeOut.IsZero() &&
+		"" == entry.project)
 }
