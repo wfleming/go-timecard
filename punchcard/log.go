@@ -90,7 +90,7 @@ func (log Log) PunchIn(time time.Time, projectName string) error {
 	if err != nil {
 		return err
 	} else if lastEntry != nil && lastEntry.timeOut.IsZero() {
-		return errors.New("last entry should have timeOut")
+		return errors.New("last entry should have punched out")
 	}
 	logline := LogLine{IN, time, projectName}
 	line := logline.String() + "\n"
