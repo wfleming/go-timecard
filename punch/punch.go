@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"github.com/wfleming/go-punchcard/punchcard"
 	"os"
+	"os/user"
+	"path/filepath"
+	"strings"
 )
 
-const defaultFileName = "~/.punch/entries.log"
+const defaultFilename = "~/.punch/entries.log"
 
 type appConfig struct {
 	log *punchcard.Log
@@ -45,7 +48,63 @@ func main() {
 }
 
 func makeConfig() (*appConfig, error) {
-	return nil, nil
+	var config appConfig
+
+	stat, _ := os.Stdin.Stat()
+	if (stat.Mode() & os.ModeCharDevice) == 0 {
+		// this indicates data is being piped, so use stdin in for log
+		config.log = punchcard.NewLog(os.Stdin, os.Stdout)
+	} else {
+		fh, err := getLogFile(defaultFilename)
+		if err != nil {
+			return nil, err
+		}
+		config.log = punchcard.NewLog(fh, fh)
+	}
+
+	return &config, nil
+}
+
+func getLogFile(filename string) (*os.File, error) {
+	filename, err := sanitizeLogFileName(filename)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		// file does not exist: attempt to create it.
+		// first attempt to create dir if it does not exist
+		if err := os.Mkdir(filepath.Dir(filename), 0755); err != nil {
+			return nil, err
+		}
+	}
+
+	fh, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR, 0664)
+	if err != nil {
+		return nil, err
+	}
+	defer fh.Close()
+
+	return fh, nil
+}
+
+func sanitizeLogFileName(filename string) (string, error) {
+	var err error
+	// must do ~ replacement ourselves
+	if filename[:2] == "~/" {
+		usr, err := user.Current()
+		if err != nil {
+			return "", err
+		}
+		homedir := usr.HomeDir
+		filename = strings.Replace(filename, "~", homedir, 1)
+	}
+
+	filename, err = filepath.Abs(filename)
+	if err != nil {
+		return "", err
+	}
+
+	return filename, nil
 }
 
 // can't do it as part of decl, or there's a reference loop
