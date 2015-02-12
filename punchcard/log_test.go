@@ -2,6 +2,9 @@ package punchcard
 
 import (
 	"bytes"
+	"fmt"
+	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 )
@@ -130,28 +133,41 @@ func TestLastEntryNonEmpty(t *testing.T) {
 }
 
 func TestPunchInAndOut(t *testing.T) {
-	data := bytes.NewBufferString("")
-	log := NewLog(data, data)
+	var fh, err = ioutil.TempFile(os.TempDir(), "log-test")
+	defer fh.Close()
+
+	if err != nil {
+		t.Fatal("failed to make temp file", err)
+	}
+
+	log := NewLog(fh, fh)
 
 	if err := log.PunchIn(time1, "coding"); err != nil {
-		t.Fatal("punch in should not have failed")
+		t.Fatal("punch in should not have failed", err)
 	}
 
 	var expected = "IN\t2015-02-10T15:30:10Z\tcoding\n"
-	if expected != data.String() {
+	fh.Seek(0, 0)
+	var filestr, _ = ioutil.ReadAll(fh)
+	if expected != string(filestr) {
 		t.Errorf("after punch in, log buffer contents do not match: expected {%s} but got {%s}",
-			expected, data.String())
+			expected, string(filestr))
 	}
+	fh.Seek(0, 0) //TODO: it would be nice if the tool took care of caching
 
 	if err := log.PunchOut(time2); err != nil {
-		t.Fatal("punch in should not have failed")
+		t.Fatal("punch out should not have failed", err)
 	}
 
 	expected = expected + "OUT\t2015-02-10T16:30:10Z\tcoding\n"
-	if expected != data.String() {
+	fh.Seek(0, 0)
+	filestr, _ = ioutil.ReadAll(fh)
+	if expected != string(filestr) {
 		t.Errorf("after punch out, log buffer contents do not match: expected {%s} but got {%s}",
-			expected, data.String())
+			expected, string(filestr))
 	}
+
+	os.Remove(fh.Name())
 }
 
 func TestPunchOutError(t *testing.T) {
