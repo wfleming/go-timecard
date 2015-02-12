@@ -90,14 +90,14 @@ func TestAllEntries(t *testing.T) {
 	}
 
 	var entry = entries[0]
-	if entry.timeIn != time1 || entry.timeOut != time2 ||
-		entry.project != "coding" {
+	if entry.TimeIn != time1 || entry.TimeOut != time2 ||
+		entry.Project != "coding" {
 		t.Error("first entry not as expeced", entry)
 	}
 
 	entry = entries[1]
-	if entry.timeIn != time3 || !entry.timeOut.IsZero() ||
-		entry.project != "typing" {
+	if entry.TimeIn != time3 || !entry.TimeOut.IsZero() ||
+		entry.Project != "typing" {
 		t.Error("second entry not as expected", entry)
 	}
 }
@@ -125,8 +125,8 @@ func TestLastEntryNonEmpty(t *testing.T) {
 		t.Fatal("turning LogLines into entries should not have failed")
 	}
 
-	if entry.timeIn != time3 || !entry.timeOut.IsZero() ||
-		entry.project != "typing" {
+	if entry.TimeIn != time3 || !entry.TimeOut.IsZero() ||
+		entry.Project != "typing" {
 		t.Error("last entry not as expected", entry)
 	}
 }

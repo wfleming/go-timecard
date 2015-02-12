@@ -63,7 +63,7 @@ func (log *Log) AllEntries() ([]*Entry, error) {
 	for _, logline := range loglines {
 		var entry *Entry
 		// if last entry has IN but not OUT, next line should be OUT
-		if len(log.entries) > 0 && log.entries[len(log.entries)-1].timeOut.IsZero() {
+		if len(log.entries) > 0 && log.entries[len(log.entries)-1].TimeOut.IsZero() {
 			entry = log.entries[len(log.entries)-1]
 		} else {
 			entry = NewEntry()
@@ -94,7 +94,7 @@ func (log *Log) PunchIn(time time.Time, projectName string) error {
 	lastEntry, err := log.LastEntry()
 	if err != nil {
 		return err
-	} else if lastEntry != nil && lastEntry.timeOut.IsZero() {
+	} else if lastEntry != nil && lastEntry.TimeOut.IsZero() {
 		return errors.New("last entry should have punched out")
 	}
 	logline := LogLine{IN, time, projectName}
@@ -121,7 +121,7 @@ func (log *Log) PunchOut(time time.Time) error {
 	} else if lastEntry == nil || lastEntry.IsZero() {
 		return errors.New("Entry should not be empty")
 	}
-	logline := LogLine{OUT, time, lastEntry.project}
+	logline := LogLine{OUT, time, lastEntry.Project}
 	strline := logline.String() + "\n"
 	bytes, err := (*log.out).Write([]byte(strline))
 	if err != nil {

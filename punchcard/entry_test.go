@@ -11,7 +11,7 @@ func TestEntryIsZero(t *testing.T) {
 		t.Error("uninited entry should be zero")
 	}
 
-	entry.project = "foo"
+	entry.Project = "foo"
 	if entry.IsZero() {
 		t.Error("entry with data should not be zero")
 	}
@@ -28,8 +28,8 @@ func TestEntryPushLogLineErrors(t *testing.T) {
 		t.Error("pushing empty project should error")
 	}
 
-	entry.project = "foo"
-	entry.timeIn = now.Add(-500)
+	entry.Project = "foo"
+	entry.TimeIn = now.Add(-500)
 
 	if entry.pushLogLine(LogLine{IN, now, "foo"}) == nil {
 		t.Error("punch in twice should error")
@@ -47,7 +47,7 @@ func TestEntryPushLogLineErrors(t *testing.T) {
 		t.Error("can't punch out with different project name")
 	}
 
-	entry.timeOut = now
+	entry.TimeOut = now
 
 	if entry.pushLogLine(LogLine{OUT, now.Add(600), ""}) == nil {
 		t.Error("can't punch out twice")
@@ -62,11 +62,11 @@ func TestEntryPushLogLineSuccess(t *testing.T) {
 		t.Error("punch in should not have failed")
 	}
 
-	if entry.project != project {
+	if entry.Project != project {
 		t.Error("punch in should have set project")
 	}
 
-	if !entry.timeIn.Equal(now) {
+	if !entry.TimeIn.Equal(now) {
 		t.Error("punch in should have set timeIn")
 	}
 
@@ -75,11 +75,11 @@ func TestEntryPushLogLineSuccess(t *testing.T) {
 		t.Error("punch out should not have failed")
 	}
 
-	if entry.project != project {
+	if entry.Project != project {
 		t.Error("punch out should not change project")
 	}
 
-	if !entry.timeOut.Equal(future) {
+	if !entry.TimeOut.Equal(future) {
 		t.Error("punch out should have set timeOut")
 	}
 
