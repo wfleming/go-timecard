@@ -2,7 +2,6 @@ package punchcard
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -153,7 +152,6 @@ func TestPunchInAndOut(t *testing.T) {
 		t.Errorf("after punch in, log buffer contents do not match: expected {%s} but got {%s}",
 			expected, string(filestr))
 	}
-	fh.Seek(0, 0) //TODO: it would be nice if the tool took care of caching
 
 	if err := log.PunchOut(time2); err != nil {
 		t.Fatal("punch out should not have failed", err)

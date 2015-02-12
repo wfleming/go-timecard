@@ -19,15 +19,16 @@ import (
 )
 
 type Log struct {
-	in  *io.Reader
-	out *io.Writer
+	in      *io.Reader
+	out     *io.Writer
+	entries []*Entry
 }
 
 func NewLog(in io.Reader, out io.Writer) *Log {
-	return &Log{&in, &out}
+	return &Log{&in, &out, make([]*Entry, 0)}
 }
 
-func (log Log) allLogLines() ([]LogLine, error) {
+func (log *Log) allLogLines() ([]LogLine, error) {
 	var lines []LogLine
 
 	scanner := bufio.NewScanner(*log.in)
@@ -47,8 +48,12 @@ func (log Log) allLogLines() ([]LogLine, error) {
 	return lines, nil
 }
 
-func (log Log) AllEntries() ([]*Entry, error) {
-	var entries []*Entry
+func (log *Log) AllEntries() ([]*Entry, error) {
+	// entries are cached within the Log, and only parsed once.
+	if len(log.entries) > 0 {
+		return log.entries, nil
+	}
+
 	loglines, err := log.allLogLines()
 
 	if err != nil {
@@ -58,23 +63,23 @@ func (log Log) AllEntries() ([]*Entry, error) {
 	for _, logline := range loglines {
 		var entry *Entry
 		// if last entry has IN but not OUT, next line should be OUT
-		if len(entries) > 0 && entries[len(entries)-1].timeOut.IsZero() {
-			entry = entries[len(entries)-1]
+		if len(log.entries) > 0 && log.entries[len(log.entries)-1].timeOut.IsZero() {
+			entry = log.entries[len(log.entries)-1]
 		} else {
 			entry = NewEntry()
 		}
 		if err := entry.pushLogLine(logline); err != nil {
 			return nil, err
 		}
-		if len(entries) == 0 || entry != entries[len(entries)-1] {
-			entries = append(entries, entry)
+		if len(log.entries) == 0 || entry != log.entries[len(log.entries)-1] {
+			log.entries = append(log.entries, entry)
 		}
 	}
 
-	return entries, nil
+	return log.entries, nil
 }
 
-func (log Log) LastEntry() (*Entry, error) {
+func (log *Log) LastEntry() (*Entry, error) {
 	allEntries, err := log.AllEntries()
 	if err != nil {
 		return nil, err
@@ -85,7 +90,7 @@ func (log Log) LastEntry() (*Entry, error) {
 }
 
 // write an IN line to the log (if valid)
-func (log Log) PunchIn(time time.Time, projectName string) error {
+func (log *Log) PunchIn(time time.Time, projectName string) error {
 	lastEntry, err := log.LastEntry()
 	if err != nil {
 		return err
@@ -93,18 +98,23 @@ func (log Log) PunchIn(time time.Time, projectName string) error {
 		return errors.New("last entry should have punched out")
 	}
 	logline := LogLine{IN, time, projectName}
-	line := logline.String() + "\n"
-	bytes, err := (*log.out).Write([]byte(line))
+	strline := logline.String() + "\n"
+	bytes, err := (*log.out).Write([]byte(strline))
 	if err != nil {
 		return err
-	} else if bytes != len(line) {
+	} else if bytes != len(strline) {
 		return errors.New("Wrong number of bytes written")
 	}
+	entry := NewEntry()
+	if err := entry.pushLogLine(logline); err != nil {
+		return err
+	}
+	log.entries = append(log.entries, entry)
 	return nil
 }
 
 // write an OUT line to the log (if valid)
-func (log Log) PunchOut(time time.Time) error {
+func (log *Log) PunchOut(time time.Time) error {
 	lastEntry, err := log.LastEntry()
 	if err != nil {
 		return err
@@ -112,12 +122,14 @@ func (log Log) PunchOut(time time.Time) error {
 		return errors.New("Entry should not be empty")
 	}
 	logline := LogLine{OUT, time, lastEntry.project}
-	line := logline.String() + "\n"
-	bytes, err := (*log.out).Write([]byte(line))
+	strline := logline.String() + "\n"
+	bytes, err := (*log.out).Write([]byte(strline))
 	if err != nil {
 		return err
-	} else if bytes != len(line) {
+	} else if bytes != len(strline) {
 		return errors.New("Wrong number of bytes written")
+	} else if err := lastEntry.pushLogLine(logline); err != nil {
+		return err
 	}
 	return nil
 }
