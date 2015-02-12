@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func runIn(args []string) {
+func runIn(config *appConfig, args []string) {
 	if len(args) < 1 || args[0] == "--help" || args[0] == "-h" {
 		printInHelp()
 		return

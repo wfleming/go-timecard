@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func runHelp(args []string) {
+func runHelp(config *appConfig, args []string) {
 	if 0 == len(args) {
 		printMainHelp()
 	} else if c, exists := commands[args[0]]; !exists {

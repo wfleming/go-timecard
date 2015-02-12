@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func runSummary(args []string) {
+func runSummary(config *appConfig, args []string) {
 	if len(args) > 0 && (args[0] == "--help" || args[0] == "-h") {
 		printSummaryHelp()
 		return
