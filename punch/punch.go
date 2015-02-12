@@ -12,7 +12,8 @@ import (
 const defaultFilename = "~/.punch/entries.log"
 
 type appConfig struct {
-	log *punchcard.Log
+	log     *punchcard.Log
+	logfile *os.File // gets set if we're using an actual file for the log
 }
 
 type appCommand struct {
@@ -24,13 +25,13 @@ var commands = map[string]appCommand{}
 
 func main() {
 	setupCommands()
-
 	config, err := makeConfig()
 
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
 		os.Exit(1)
 	}
+	defer config.close()
 
 	if 0 == len(os.Args[1:]) {
 		commands["help"].run(config, os.Args[1:])
@@ -60,6 +61,7 @@ func makeConfig() (*appConfig, error) {
 			return nil, err
 		}
 		config.log = punchcard.NewLog(fh, fh)
+		config.logfile = fh
 	}
 
 	return &config, nil
@@ -82,9 +84,6 @@ func getLogFile(filename string) (*os.File, error) {
 	if err != nil {
 		return nil, err
 	}
-	// TODO: can't do this here because we need it for life of program.
-	// how to guarantee it happens?
-	// defer fh.Close()
 
 	return fh, nil
 }
@@ -115,4 +114,12 @@ func setupCommands() {
 	commands["in"] = appCommand{runIn, printInHelp}
 	commands["out"] = appCommand{runOut, printOutHelp}
 	commands["summary"] = appCommand{runSummary, printSummaryHelp}
+}
+
+// cleanup necessary parts of the appConfig, such as closing file handles
+func (config *appConfig) close() {
+	if config.logfile != nil {
+		config.logfile.Sync()
+		config.logfile.Close()
+	}
 }
