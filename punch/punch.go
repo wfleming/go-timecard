@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	// "github.com/wfleming/go-punchcard/punchcard"
 	"os"
 )
@@ -21,19 +20,20 @@ func main() {
 		return
 	}
 
-	switch subcommand := os.Args[1]; subcommand {
-	case "in":
-		fmt.Println("TODO punch in")
-	case "out":
-		fmt.Println("TODO to punch out")
-	case "summary":
-		fmt.Println("TODO: to print summary")
-	default:
+	commandName := os.Args[1]
+	command, exists := commands[commandName]
+
+	if exists {
+		command.run(os.Args[2:])
+	} else {
 		commands["help"].run(os.Args[2:])
 	}
 }
 
-// can't do it as part of variable, or there's a reference loop
+// can't do it as part of decl, or there's a reference loop
 func setupCommands() {
 	commands["help"] = command{runHelp, printMainHelp}
+	commands["in"] = command{runIn, printInHelp}
+	commands["out"] = command{runOut, printOutHelp}
+	commands["summary"] = command{runSummary, printSummaryHelp}
 }
