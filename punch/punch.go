@@ -82,7 +82,9 @@ func getLogFile(filename string) (*os.File, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer fh.Close()
+	// TODO: can't do this here because we need it for life of program.
+	// how to guarantee it happens?
+	// defer fh.Close()
 
 	return fh, nil
 }
