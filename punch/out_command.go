@@ -13,12 +13,15 @@ func runOut(config *appConfig, args []string) {
 	}
 
 	if err := config.log.PunchOut(time.Now()); err != nil {
-		fmt.Printf("Error: %s\n", err)
+		fmt.Printf("Error punching out: %s\n", err)
 		os.Exit(1)
 	}
 	lastEntry, err := config.log.LastEntry()
 	if err != nil {
-		fmt.Printf("We wrote to log, but got error getting entry: %s\n", err)
+		fmt.Printf(
+			"Punched out, but encountered error getting "+
+				"entry: %s\n",
+			err)
 		os.Exit(1)
 	}
 	fmt.Printf("Punched out of %s\n", lastEntry.Project)
