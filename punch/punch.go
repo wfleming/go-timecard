@@ -73,8 +73,9 @@ func getLogFile(filename string) (*os.File, error) {
 		return nil, err
 	}
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
-		// file does not exist: attempt to create it.
-		// first attempt to create dir if it does not exist
+		// file does not exist: dir may not exist either
+		// attempt to create dir if it does not exist
+		// file will be created by OpenFile later
 		if err := os.Mkdir(filepath.Dir(filename), 0755); err != nil {
 			return nil, err
 		}
