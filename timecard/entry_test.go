@@ -82,5 +82,17 @@ func TestEntryPushLogLineSuccess(t *testing.T) {
 	if !entry.TimeOut.Equal(future) {
 		t.Error("punch out should have set timeOut")
 	}
+}
 
+func TestEntryDuration(t *testing.T) {
+	loc, _ := time.LoadLocation("Local")
+	entry := Entry{
+		time.Date(2015, 02, 15, 14, 30, 00, 00, loc),
+		time.Date(2015, 02, 15, 15, 15, 00, 00, loc),
+		"task",
+	}
+
+	if 45 != entry.Duration().Minutes() {
+		t.Error("entry duration should have been 45 minutes")
+	}
 }

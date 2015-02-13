@@ -49,3 +49,7 @@ func (entry *Entry) pushLogLine(line LogLine) error {
 
 	return nil
 }
+
+func (entry *Entry) Duration() time.Duration {
+	return entry.TimeOut.Sub(entry.TimeIn)
+}
