@@ -12,7 +12,7 @@ import (
 const defaultFilename = "~/.punch/entries.log"
 
 type appConfig struct {
-	log     *punchcard.Log
+	log     *timecard.Log
 	logfile *os.File // gets set if we're using an actual file for the log
 }
 
@@ -54,13 +54,13 @@ func makeConfig() (*appConfig, error) {
 	stat, _ := os.Stdin.Stat()
 	if (stat.Mode() & os.ModeCharDevice) == 0 {
 		// this indicates data is being piped, so use stdin in for log
-		config.log = punchcard.NewLog(os.Stdin, os.Stdout)
+		config.log = timecard.NewLog(os.Stdin, os.Stdout)
 	} else {
 		fh, err := getLogFile(defaultFilename)
 		if err != nil {
 			return nil, err
 		}
-		config.log = punchcard.NewLog(fh, fh)
+		config.log = timecard.NewLog(fh, fh)
 		config.logfile = fh
 	}
 
