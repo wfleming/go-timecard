@@ -27,8 +27,8 @@ func (entry *Entry) pushLogLine(line LogLine) error {
 		return errors.New("Entry full: no more actions allowed")
 	case entry.TimeIn.IsZero() && IN != line.action:
 		return errors.New("Entry must punch in before punching out")
-	case !entry.TimeIn.IsZero() && OUT != line.action:
-		return errors.New("Entry must cannot punch in twice")
+	case !entry.TimeIn.IsZero() && IN == line.action:
+		return errors.New("Entry cannot punch in twice")
 	case "" == line.project:
 		return errors.New("Empty project name not permitted")
 	case OUT == line.action && line.time.Before(entry.TimeIn):
