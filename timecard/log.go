@@ -1,4 +1,4 @@
-package punchcard
+package timecard
 
 /* Functions for dealing with a punchcard-log formatted stream (file, pipe)
  *

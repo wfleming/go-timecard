@@ -1,4 +1,4 @@
-package punchcard
+package timecard
 
 import (
 	"testing"

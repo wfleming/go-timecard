@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/wfleming/go-punchcard/punchcard"
+	"github.com/wfleming/go-punchcard/timecard"
 	"os"
 	"os/user"
 	"path/filepath"
