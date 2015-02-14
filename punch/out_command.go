@@ -7,7 +7,7 @@ import (
 )
 
 func runOut(config *appConfig, args []string) {
-	if len(args) > 0 && (args[0] == "--help" || args[0] == "-h") {
+	if len(args) > 0 {
 		printOutHelp()
 		return
 	}
