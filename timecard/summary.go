@@ -1,6 +1,7 @@
 package timecard
 
 import (
+	"sort"
 	"time"
 )
 
@@ -9,10 +10,22 @@ type ProjectHours struct {
 	Hours   float64
 }
 
+type byProject []ProjectHours
+
+func (bp byProject) Len() int           { return len(bp) }
+func (bp byProject) Swap(i, j int)      { bp[i], bp[j] = bp[j], bp[i] }
+func (bp byProject) Less(i, j int) bool { return bp[i].Project < bp[j].Project }
+
 type DaySummary struct {
 	Date  time.Time
 	Hours []ProjectHours // should be sorted by project name
 }
+
+type byDate []DaySummary
+
+func (bd byDate) Len() int           { return len(bd) }
+func (bd byDate) Swap(i, j int)      { bd[i], bd[j] = bd[j], bd[i] }
+func (bd byDate) Less(i, j int) bool { return bd[i].Date.Before(bd[j].Date) }
 
 type Summary struct {
 	entries   []Entry
@@ -45,12 +58,12 @@ func (s *Summary) buildSummaries() []DaySummary {
 			daySummary.Hours = append(daySummary.Hours, ph)
 		}
 
-		//TODO: sort []ProjectHours
+		sort.Sort(byProject(daySummary.Hours))
 
 		summaries = append(summaries, daySummary)
 	}
 
-	//TODO: sort []DaySummary
+	sort.Sort(byDate(summaries))
 
 	return summaries
 }
