@@ -33,10 +33,26 @@ func (s *Summary) GetSummaries() []DaySummary {
 // builds the summary of the entries in s
 func (s *Summary) buildSummaries() []DaySummary {
 	// get map of date => project name => hours
-	//m := s.buildDataMap()
+	m := s.buildDataMap()
+	var summaries = make([]DaySummary, 0)
 
-	//TODO transform map to []DaySummary
-	return nil
+	// convert that map to []DaySummary
+	for date, projHourMap := range m {
+		daySummary := DaySummary{date, make([]ProjectHours, 0)}
+
+		for project, hours := range projHourMap {
+			ph := ProjectHours{project, hours}
+			daySummary.Hours = append(daySummary.Hours, ph)
+		}
+
+		//TODO: sort []ProjectHours
+
+		summaries = append(summaries, daySummary)
+	}
+
+	//TODO: sort []DaySummary
+
+	return summaries
 }
 
 // build all the data in a structure of maps: easier while iterating over
