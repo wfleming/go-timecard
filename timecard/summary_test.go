@@ -6,7 +6,7 @@ import (
 )
 
 func TestNewSummary(t *testing.T) {
-	entries := []Entry{Entry{time.Now(), time.Now().Add(50000), "task"}}
+	entries := []*Entry{&Entry{time.Now(), time.Now().Add(50000), "task"}}
 	summary := NewSummary(entries)
 
 	if summary.entries[0] != entries[0] {
@@ -35,17 +35,17 @@ func TestAtMidnight(t *testing.T) {
 	}
 }
 
-func getTestEntries() (time.Time, []Entry) {
+func getTestEntries() (time.Time, []*Entry) {
 	d1, _ := time.Parse(time.RFC3339, "2015-02-10T15:00:00Z")
 	a := func(t time.Time, hours float64) time.Time {
 		duration := time.Duration(hours * float64(time.Hour))
 		return t.Add(duration)
 	}
-	entries := []Entry{
-		Entry{d1, a(d1, 1), "task1"},
-		Entry{a(d1, 2), a(d1, 2.5), "task2"},
-		Entry{a(d1, 5), a(d1, 6.5), "task1"},
-		Entry{a(d1, 24), a(d1, 26), "task2"},
+	entries := []*Entry{
+		&Entry{d1, a(d1, 1), "task1"},
+		&Entry{a(d1, 2), a(d1, 2.5), "task2"},
+		&Entry{a(d1, 5), a(d1, 6.5), "task1"},
+		&Entry{a(d1, 24), a(d1, 26), "task2"},
 	}
 
 	return d1, entries

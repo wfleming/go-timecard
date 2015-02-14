@@ -28,11 +28,11 @@ func (bd byDate) Swap(i, j int)      { bd[i], bd[j] = bd[j], bd[i] }
 func (bd byDate) Less(i, j int) bool { return bd[i].Date.Before(bd[j].Date) }
 
 type Summary struct {
-	entries   []Entry
+	entries   []*Entry
 	summaries []DaySummary // should be sorted by date
 }
 
-func NewSummary(entries []Entry) *Summary {
+func NewSummary(entries []*Entry) *Summary {
 	return &Summary{entries, nil}
 }
 
