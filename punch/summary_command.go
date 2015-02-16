@@ -28,7 +28,7 @@ func runSummary(config *appConfig, args []string) {
 
 	if len(entries) > 0 && entries[len(entries)-1].TimeOut.IsZero() {
 		// exclude final entry if it has not been checked out
-		entries = entries[:len(entries)]
+		entries = entries[:(len(entries) - 1)]
 	}
 
 	exitIfNoEntries(entries)
