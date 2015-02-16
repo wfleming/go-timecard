@@ -53,16 +53,20 @@ func exitIfNoEntries(entries []*timecard.Entry) {
 
 // do the standard printing of the summary data
 func printSummariesStd(summaries []timecard.DaySummary) {
-	tabwriter := tabwriter.NewWriter(os.Stdout, 1, 8, 0, '\t', tabwriter.TabIndent)
+	w := tabwriter.NewWriter(os.Stdout, 1, 8, 0, '\t', tabwriter.TabIndent)
 
 	for _, daySummary := range summaries {
 		fmt.Println(daySummary.Date.Format(humanDate))
+		var dayTotal = 0.0
 
 		for _, projHours := range daySummary.Hours {
 			line := fmt.Sprintf("\t%s:\t%.2f\n", projHours.Project, projHours.Hours)
-			tabwriter.Write([]byte(line))
+			w.Write([]byte(line))
+			dayTotal += projHours.Hours
 		}
-		tabwriter.Flush()
+		totLine := fmt.Sprintf("\tDAY TOTAL:\t%.2f\n", dayTotal)
+		w.Write([]byte(totLine))
+		w.Flush()
 		fmt.Println("")
 	}
 }
