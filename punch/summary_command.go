@@ -5,6 +5,7 @@ import (
 	"github.com/wfleming/go-timecard/timecard"
 	"os"
 	"sort"
+	"text/tabwriter"
 	"time"
 )
 
@@ -52,12 +53,16 @@ func exitIfNoEntries(entries []*timecard.Entry) {
 
 // do the standard printing of the summary data
 func printSummariesStd(summaries []timecard.DaySummary) {
+	tabwriter := tabwriter.NewWriter(os.Stdout, 1, 8, 0, '\t', tabwriter.TabIndent)
+
 	for _, daySummary := range summaries {
 		fmt.Println(daySummary.Date.Format(humanDate))
 
 		for _, projHours := range daySummary.Hours {
-			fmt.Printf("\t%s: %.2f\n", projHours.Project, projHours.Hours)
+			line := fmt.Sprintf("\t%s:\t%.2f\n", projHours.Project, projHours.Hours)
+			tabwriter.Write([]byte(line))
 		}
+		tabwriter.Flush()
 		fmt.Println("")
 	}
 }
