@@ -1,6 +1,9 @@
 go-timecard
 ===========
 
+[![Circle CI](https://circleci.com/gh/wfleming/go-timecard.svg?style=svg)](https://circleci.com/gh/wfleming/go-timecard)
+
+
 A simple timecard tool written in Go.
 
 Installation
