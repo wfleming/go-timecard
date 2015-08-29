@@ -2,7 +2,7 @@ go-timecard
 ===========
 
 [![Circle CI](https://circleci.com/gh/wfleming/go-timecard.svg?style=svg)](https://circleci.com/gh/wfleming/go-timecard)
-
+[![Code Climate](https://codeclimate.com/github/wfleming/go-timecard/badges/gpa.svg)](https://codeclimate.com/github/wfleming/go-timecard)
 
 A simple timecard tool written in Go.
 
