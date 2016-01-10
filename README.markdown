@@ -61,11 +61,6 @@ FAQ
 
     `tail -20 ~/.punch/entries.log | punch summary`
 
-    NB: Right now `punch` expects all event streams to start with an `in` event.
-    So, assuming you are currently punched out when requesting a summary, make
-    sure to specify an even number of lines. Conversely, if you are currently
-    punched in, make sure to specify an odd number.
-
 5. **You didn't answer my question**
 
     Well, nobody actually asked me any questions, I was just making them up.

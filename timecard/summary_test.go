@@ -6,7 +6,7 @@ import (
 )
 
 func TestNewSummary(t *testing.T) {
-	entries := []*Entry{&Entry{time.Now(), time.Now().Add(50000), "task"}}
+	entries := []*Entry{&Entry{"task", time.Now(), time.Now().Add(50000)}}
 	summary := NewSummary(entries)
 
 	if summary.entries[0] != entries[0] {
@@ -42,10 +42,10 @@ func getTestEntries() (time.Time, []*Entry) {
 		return t.Add(duration)
 	}
 	entries := []*Entry{
-		&Entry{d1, a(d1, 1), "task1"},
-		&Entry{a(d1, 2), a(d1, 2.5), "task2"},
-		&Entry{a(d1, 5), a(d1, 6.5), "task1"},
-		&Entry{a(d1, 24), a(d1, 26), "task2"},
+		&Entry{"task1", d1, a(d1, 1)},
+		&Entry{"task2", a(d1, 2), a(d1, 2.5)},
+		&Entry{"task1", a(d1, 5), a(d1, 6.5)},
+		&Entry{"task2", a(d1, 24), a(d1, 26)},
 	}
 
 	return d1, entries

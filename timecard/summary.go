@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// ProjectHours is the pair of a project and a number of hours
 type ProjectHours struct {
 	Project string
 	Hours   float64
@@ -16,6 +17,7 @@ func (bp byProject) Len() int           { return len(bp) }
 func (bp byProject) Swap(i, j int)      { bp[i], bp[j] = bp[j], bp[i] }
 func (bp byProject) Less(i, j int) bool { return bp[i].Project < bp[j].Project }
 
+// DaySummary is the summary of all entries for a Date, broken down by project
 type DaySummary struct {
 	Date  time.Time
 	Hours []ProjectHours // should be sorted by project name
@@ -27,15 +29,18 @@ func (bd byDate) Len() int           { return len(bd) }
 func (bd byDate) Swap(i, j int)      { bd[i], bd[j] = bd[j], bd[i] }
 func (bd byDate) Less(i, j int) bool { return bd[i].Date.Before(bd[j].Date) }
 
+// Summary is an opaque type for getting summarization date of a set of entries
 type Summary struct {
 	entries   []*Entry
 	summaries []DaySummary // should be sorted by date
 }
 
+// NewSummary constructs a new Summary from an array of Entries
 func NewSummary(entries []*Entry) *Summary {
 	return &Summary{entries, nil}
 }
 
+// GetSummaries returns all DaySummaries for a Summary
 func (s *Summary) GetSummaries() []DaySummary {
 	if s.summaries == nil {
 		s.summaries = s.buildSummaries()
