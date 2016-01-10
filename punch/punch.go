@@ -1,3 +1,4 @@
+// The punch binary is the CLI interface for the timecard package
 package main
 
 import (
@@ -76,7 +77,7 @@ func getLogFile(filename string) (*os.File, error) {
 		// file does not exist: dir may not exist either
 		// attempt to create dir if it does not exist
 		// file will be created by OpenFile later
-		if err := os.Mkdir(filepath.Dir(filename), 0755); err != nil {
+		if err := createDirIfNotExist(filename); err != nil {
 			return nil, err
 		}
 	}
@@ -87,6 +88,16 @@ func getLogFile(filename string) (*os.File, error) {
 	}
 
 	return fh, nil
+}
+
+func createDirIfNotExist(logFilename string) error {
+	dir := filepath.Dir(logFilename)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		if err := os.Mkdir(dir, 0755); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func sanitizeLogFileName(filename string) (string, error) {

@@ -17,82 +17,84 @@ func TestEntryIsZero(t *testing.T) {
 	}
 }
 
-func TestEntryPushLogLineErrors(t *testing.T) {
-	now := time.Now()
-	var entry Entry
-	if entry.pushLogLine(LogLine{OUT, now, ""}) == nil {
-		t.Error("pushing out to empty entry should error")
-	}
-
-	if entry.pushLogLine(LogLine{IN, now.Add(-500), ""}) == nil {
-		t.Error("pushing empty project should error")
-	}
-
-	entry.Project = "foo"
-	entry.TimeIn = now.Add(-500)
-
-	if entry.pushLogLine(LogLine{IN, now, "foo"}) == nil {
-		t.Error("punch in twice should error")
-	}
-
-	if entry.pushLogLine(LogLine{-1, now, "foo"}) == nil {
-		t.Error("invalid action should error")
-	}
-
-	if entry.pushLogLine(LogLine{OUT, now.Add(-600), "foo"}) == nil {
-		t.Error("can't punch out before punching in")
-	}
-
-	if entry.pushLogLine(LogLine{OUT, now.Add(600), "bar"}) == nil {
-		t.Error("can't punch out with different project name")
-	}
-
-	entry.TimeOut = now
-
-	if entry.pushLogLine(LogLine{OUT, now.Add(600), ""}) == nil {
-		t.Error("can't punch out twice")
-	}
-}
-
-func TestEntryPushLogLineSuccess(t *testing.T) {
-	project, now := "foo proj", time.Now()
-	var entry Entry
-
-	if entry.pushLogLine(LogLine{IN, now, project}) != nil {
-		t.Error("punch in should not have failed")
-	}
-
-	if entry.Project != project {
-		t.Error("punch in should have set project")
-	}
-
-	if !entry.TimeIn.Equal(now) {
-		t.Error("punch in should have set timeIn")
-	}
-
-	future := now.Add(500)
-	if entry.pushLogLine(LogLine{OUT, future, project}) != nil {
-		t.Error("punch out should not have failed")
-	}
-
-	if entry.Project != project {
-		t.Error("punch out should not change project")
-	}
-
-	if !entry.TimeOut.Equal(future) {
-		t.Error("punch out should have set timeOut")
-	}
-}
-
 func TestEntryDuration(t *testing.T) {
 	loc, _ := time.LoadLocation("Local")
 	entry := Entry{
+		"task",
 		time.Date(2015, 02, 15, 14, 30, 00, 00, loc),
 		time.Date(2015, 02, 15, 15, 15, 00, 00, loc),
-		"task",
 	}
 
 	if 45 != entry.Duration().Minutes() {
 		t.Error("entry duration should have been 45 minutes")
+	}
+}
+
+func TestEntryStringInOnly(t *testing.T) {
+	parsedTimeIn, _ := time.Parse(time.RFC3339, "2015-02-10T15:30:10Z")
+	entry := Entry{"project name", parsedTimeIn, time.Time{}}
+	strline := entry.String()
+	if "project name\t2015-02-10T15:30:10Z" != strline {
+		t.Error("Not expected line string", strline)
+	}
+}
+
+func TestEntryStringFullEntry(t *testing.T) {
+	parsedTimeIn, _ := time.Parse(time.RFC3339, "2015-02-10T15:30:10Z")
+	parsedTimeOut, _ := time.Parse(time.RFC3339, "2015-02-10T16:30:10Z")
+	entry := Entry{"project name", parsedTimeIn, parsedTimeOut}
+	strline := entry.String()
+	if "project name\t2015-02-10T15:30:10Z\t2015-02-10T16:30:10Z" != strline {
+		t.Error("Not expected line string", strline)
+	}
+}
+
+func TestParseLogLineGoodInOnlyLine(t *testing.T) {
+	parsedTime, _ := time.Parse(time.RFC3339, "2015-02-10T15:30:10Z")
+	line := "coding\t2015-02-10T15:30:10Z"
+	entry, err := parseLogLine(line)
+	if err != nil {
+		t.Error("Unexpected parsing error", err)
+	} else if entry.Project != "coding" {
+		t.Error("Entry has wrong project name")
+	} else if !entry.TimeIn.Equal(parsedTime) {
+		t.Error("Entry has wrong timeIn")
+	}
+}
+
+func TestParseLogLineGoodCompleteLine(t *testing.T) {
+	parsedTimeIn, _ := time.Parse(time.RFC3339, "2015-02-10T15:30:10Z")
+	parsedTimeOut, _ := time.Parse(time.RFC3339, "2015-02-10T16:30:10Z")
+	line := "project name\t2015-02-10T15:30:10Z\t2015-02-10T16:30:10Z"
+	entry, err := parseLogLine(line)
+	if err != nil {
+		t.Error("Unexpected parsing error", err)
+	} else if entry.Project != "project name" {
+		t.Error("Entry has wrong project name")
+	} else if !entry.TimeIn.Equal(parsedTimeIn) {
+		t.Error("Entry has wrong timeIn")
+	} else if !entry.TimeOut.Equal(parsedTimeOut) {
+		t.Error("Entry has wrong timeOut")
+	}
+}
+
+func TestParseLogLineBadLineInvalidTime(t *testing.T) {
+	line := "project\t2015-02-10T15:30:10Z\tnot-a-time"
+	if _, err := parseLogLine(line); err == nil {
+		t.Error("Parsing should have failed")
+	}
+}
+
+func TestParseLogLineBadLineTooManyElements(t *testing.T) {
+	line := "IN\t2015-02-10T15:30:10Z\t2015-02-10T15:30:10Z\textra"
+	if _, err := parseLogLine(line); err == nil {
+		t.Error("Parsing should have failed")
+	}
+}
+
+func TestParseLogLineBadLineTooFewElements(t *testing.T) {
+	line := "FOO"
+	if _, err := parseLogLine(line); err == nil {
+		t.Error("Parsing should have failed")
 	}
 }
